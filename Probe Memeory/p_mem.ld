@@ -4,5 +4,5 @@ ENTRY(main)
 SECTIONS
 {
   . = 0x7C00;
-  .prog : { *(.text) }
+  .text : { *(.text) }
 }

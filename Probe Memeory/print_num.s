@@ -1,6 +1,3 @@
-.globl print_num_eax
-.code16
-
 print_num_eax:
     pushl %ecx
     movw $8, %cx
