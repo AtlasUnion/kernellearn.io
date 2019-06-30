@@ -1,8 +1,8 @@
 probe_mem:
     mov $0, %eax
-    mov %eax, %es         ## clear %es
+    mov %eax, %es           ## clear %es
     movl $0, 0x8004
-    mov $0x8008, %di        ##　set di to 0x8008 so first 4 bytes can be used to store number of entries and next 4 used to store total memory length
+    mov $0x8008, %di        ## set di to 0x8008 so first 4 bytes can be used to store number of entries and next 4 used to store total memory length
     xor %ebx, %ebx          ## first call, ebx must be 0
     xor %bp, %bp            ## use bp to stors # of entires
     mov $0x0534D4150, %edx  ## move 'SMAP' signature to edx, used by BIOS to verify the caller is requesting the syste map to be returned in ES:DI

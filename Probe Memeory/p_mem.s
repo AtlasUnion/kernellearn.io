@@ -45,7 +45,8 @@ main:
     lea  const_str_return, %eax
     call print_string_eax
     loop 1b
-
+done:
+    hlt
 .include "probe_mem.s"
 .include "print_string.s"
 .include "print_num.s"
