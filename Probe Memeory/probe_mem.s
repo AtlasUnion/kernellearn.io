@@ -1,7 +1,7 @@
-probe_mem:
+probe_mem:                  ## TODO: modify this function so it takes in parameters as where to put the probed memory map and number of entries
+    movl $0, 0x8004         ## init 0x8004 to 0 as it stores the count of entres
     mov $0, %eax
     mov %eax, %es           ## clear %es
-    movl $0, 0x8004
     mov $0x8008, %di        ## set di to 0x8008 so first 4 bytes can be used to store number of entries and next 4 used to store total memory length
     xor %ebx, %ebx          ## first call, ebx must be 0
     xor %bp, %bp            ## use bp to stors # of entires
@@ -30,7 +30,7 @@ notext:
     jz skipentry            ## length is zero, skip the entry
     inc %bp                 ## entry_count++
     mov %es:8(%di), %eax    ## store length into eax
-    add %eax, 0x8004        ## add length to 0x8004 TODO: init 0x8004
+    add %eax, 0x8004        ## add length to 0x8004
     add $24, %di
 skipentry:
     test %ebx, %ebx         ## AND %ebx, %ebx => check if ebx is zero => if ebx is zero, the list is complete
