@@ -1,17 +1,20 @@
 AS=as
 ASFLAGS=--32
-OBJECTS=$(patsubst %.o)
+OBJECTS=$(patsubst %.s, %.o, $(wildcard *.s)) $(wildcard *.e) $(wildcard *.intermediate)
+OUTPUT_DIR=./build
 
-all: bootloader_mbr bootloader_stage1
-bootloader_stage1: bootloader_stage1.o
-	ld -T bootloader.ld bootloader_stage1.o -o bootloader_stage1
-bootloader_mbr: bootloader_mbr.o
-	ld -T bootloader_elf.ld bootloader_mbr.o -o bootloader_mbr
-	objcopy -j .text -O binary bootloader_mbr real_bootloader_mbr
+all: bootloader_mbr.e bootloader_stage1.e
+
+.PRECIOUS: %.o %.intermediate
+
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@ 
+%.intermediate: %.ld %.o
+	ld -T $^ -o $@
+%.e: %.intermediate
+	objcopy -j .text -O binary $< $@
 clean:
-	@rm bootloader_mbr bootloader_stage1 $(OBJECTS)
+	rm $(OBJECTS)
 write_to_MBR:
 	dd conv=notrunc if=./real_bootloader_mbr of=disk.img bs=512 count=1
 write_stage1:
@@ -20,4 +23,5 @@ write_to_disk:
 	make write_to_MBR
 	make write_stage1
 extract_sym:
-	objcopy --only-keep-debug bootloader_mbr real_bootloader_mbr.sym
+	objcopy --only-keep-debug bootloader_mbr real_bootloader_mbr.symls
+start: write_to_disk
