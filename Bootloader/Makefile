@@ -1,5 +1,5 @@
 AS=as
-ASFLAGS=--32
+ASFLAGS=--32 -g
 OBJECTS=$(patsubst %.s, %.o, $(wildcard *.s)) $(wildcard *.e) $(wildcard *.intermediate)
 OUTPUT_DIR=./build
 
@@ -16,9 +16,9 @@ all: bootloader_mbr.e bootloader_stage1.e
 clean:
 	rm $(OBJECTS)
 write_to_MBR:
-	dd conv=notrunc if=./real_bootloader_mbr of=disk.img bs=512 count=1
+	dd conv=notrunc if=./bootloader_mbr.e of=disk.img bs=512 count=1
 write_stage1:
-	dd conv=notrunc if=./bootloader_stage1 of=disk.img seek=512 bs=1 count=95
+	dd conv=notrunc if=./bootloader_stage1.e of=disk.img seek=512 bs=1 count=171
 write_to_disk:
 	make write_to_MBR
 	make write_stage1

@@ -8,18 +8,50 @@ main:
     mov $0x55AA, %bx
     int $0x13
     jc extension_not_avaliable
-    lea const_str_has_extension, %eax 
+    push %eax
+    push %ebx
+    push %ecx
+    push %ebp
+    mov  %esp, %ebp
+    lea const_str_has_extension, %eax
+    push %eax 
     call print_string_eax
-    int $0x11
+    mov %ebp, %esp
+    pop %ebp
+    pop %ecx
+    pop %ebx
+    pop %eax
     jmp load_stage1_loader_code
     hlt
 extension_not_avaliable:
+    push %eax
+    push %ebx
+    push %ecx
+    push %ebp
+    mov  %esp, %ebp
     lea const_str_no_extension, %eax
+    push %eax 
     call print_string_eax
+    mov %ebp, %esp
+    pop %ebp
+    pop %ecx
+    pop %ebx
+    pop %eax
     hlt
 load_stage1_loader_code:
+    push %eax
+    push %ebx
+    push %ecx
+    push %ebp
+    mov  %esp, %ebp
     lea const_str_starting_loading, %eax
-    call print_string_eax                ## TODO: test if BIOS extension using LBA works
+    push %eax 
+    call print_string_eax
+    mov %ebp, %esp
+    pop %ebp
+    pop %ecx
+    pop %ebx
+    pop %eax                             ## TODO: test if BIOS extension using LBA works
     mov $0x2, %ah                        ## function code
     mov $0x1, %al                        ## number of sectors to read
     mov $0x0, %ch                        ## track/cylinder number
@@ -32,9 +64,20 @@ load_stage1_loader_code:
     mov $0x7E00, %eax
     jmp *%eax
 failed:
+    push %eax
+    push %ebx
+    push %ecx
+    push %ebp
+    mov  %esp, %ebp
     lea const_str_fail, %eax
+    push %eax 
     call print_string_eax
-    hlt
+    mov %ebp, %esp
+    pop %ebp
+    pop %ecx
+    pop %ebx
+    pop %eax
+    hlt    
 .include "../Probe Memeory/print_string.s"
 
 const_str_has_extension:
