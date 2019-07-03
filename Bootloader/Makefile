@@ -1,13 +1,17 @@
+AS=as
+ASFLAGS=--32
+OBJECTS=$(patsubst %.o)
+
 all: bootloader_mbr bootloader_stage1
-bootloader_stage1:
-	as --32 bootloader_stage1.s -o bootloader_stage1.o
+bootloader_stage1: bootloader_stage1.o
 	ld -T bootloader.ld bootloader_stage1.o -o bootloader_stage1
-bootloader_mbr:
-	as --32 bootloader_mbr.s -g -o bootloader_mbr.o
+bootloader_mbr: bootloader_mbr.o
 	ld -T bootloader_elf.ld bootloader_mbr.o -o bootloader_mbr
 	objcopy -j .text -O binary bootloader_mbr real_bootloader_mbr
+%.o: %.s
+	$(AS) $(ASFLAGS) $< -o $@ 
 clean:
-	rm bootloader_mbr bootloader_stage1 *.o
+	@rm bootloader_mbr bootloader_stage1 $(OBJECTS)
 write_to_MBR:
 	dd conv=notrunc if=./real_bootloader_mbr of=disk.img bs=512 count=1
 write_stage1:
