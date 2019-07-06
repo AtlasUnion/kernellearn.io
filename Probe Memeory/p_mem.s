@@ -1,29 +1,52 @@
 .globl main
 .code16
-
+## TODO: fix printing issue
 .section .text
 main:
+    cli
+    push %ebp
+    mov  %esp, %ebp
+    push $0x8000
     call probe_mem
+    mov %ebp, %esp
+    pop %ebp
+
     lea const_str_welcome, %eax
+    push %eax 
     call print_string_eax
+
     movl 0x8004, %eax
     shr $20, %eax
+    push %eax
     call print_num_eax
+
     lea const_str_MB, %eax
+    push %eax 
     call print_string_eax
+
     mov 0x8000, %ecx
     mov $0x8008, %di
 1:
-    lea const_str_address_start, %eax  
+    lea const_str_address_start, %eax
+    push %eax  
     call print_string_eax
+
     mov %es:(%di), %eax                 ## print starting addr
+    push %eax
     call print_num_eax
-    lea const_str_blank_length, %eax    
-    call print_string_eax              
+
+    lea const_str_blank_length, %eax
+    push %eax   
+    call print_string_eax 
+
     mov %es:8(%di), %eax                ## print length
+    push %eax
     call print_num_eax
+
     lea const_str_address_status, %eax
+    push %eax
     call print_string_eax
+
     mov %es:16(%di), %eax               ## mov mem_type into %eax
     add $24, %di                        ## to next entry
     cmp $1, %eax
@@ -41,8 +64,10 @@ main:
     lea const_str_memory_type_2, %eax
     jmp 7f
 7:
+    push %eax
     call print_string_eax
     lea  const_str_return, %eax
+    push %eax
     call print_string_eax
     loop 1b
 done:
@@ -66,7 +91,7 @@ const_str_memory_type_2:
 	.asciz "Reserved"
 const_str_return:
 	.asciz "\n\r"
-.org 0x01B8
+
 .org 0x01FE
 .byte 0x55
 .byte 0xAA

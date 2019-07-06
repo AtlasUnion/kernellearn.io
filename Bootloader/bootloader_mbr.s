@@ -51,14 +51,10 @@ load_stage1_loader_code:
     pop %ebp
     pop %ecx
     pop %ebx
-    pop %eax                             ## TODO: test if BIOS extension using LBA works
-    mov $0x2, %ah                        ## function code
-    mov $0x1, %al                        ## number of sectors to read
-    mov $0x0, %ch                        ## track/cylinder number
-    mov $0x0, %dh                        ## head number
-    mov $0x2, %cl                        ## sector number
-    mov $0x80, %dl                       ## drive number (0x80=drive 0)
-    mov $0x7E00, %bx                     ## es:bx point to buffer                     
+    pop %eax                        
+    lea DAP, %si
+    mov $0x42, %ah
+    mov $0x80, %dl
     int $0x13
     jc failed
     mov $0x7E00, %eax
@@ -87,7 +83,8 @@ const_str_no_extension:
 const_str_fail:
     .asciz "Fail to load\n\r"
 const_str_starting_loading:
-    .asciz "Starting loading\n\r"
+    .asciz "Start loading\n\r"
+## do not delete below -> use for lba addressing
 DAP:
     .byte 0x10
     .byte 0x0
@@ -95,9 +92,9 @@ number_of_sector:
     .word 1
 buffer_addr: 
     .word 0x7E00
-    .word 0x0
+    .word 0
 disk_lba:
-    .long 2
+    .long 1
     .long 0
 
 .org 0x01FE

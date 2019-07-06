@@ -8,15 +8,36 @@
 ## Enter Protected Mode
 main:
     cli
-    lea const_str_success, %eax
-    call print_string_eax
-    mov %esp, %eax
-    call print_num_eax
     push %eax
-    lea const_str_new_line, %eax
+    push %ebx
+    push %ecx
+    push %ebp
+    mov  %esp, %ebp
+    lea const_str_success, %eax
+    push %eax 
     call print_string_eax
+    mov %ebp, %esp
+    pop %ebp
+    pop %ecx
+    pop %ebx
+    pop %eax
+
+    push %eax
+    push %ebx
+    push %ecx
+    push %ebp
+    mov  %esp, %ebp
     mov %esp, %eax
+    push $0x20
     call print_num_eax
+    mov %ebp, %esp
+    pop %ebp
+    pop %ecx
+    pop %ebx
+    pop %eax
+
+    
+
     hlt
 .include "../Probe Memeory/print_string.s"
 .include "../Probe Memeory/print_num.s"

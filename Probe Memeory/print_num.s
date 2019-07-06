@@ -1,9 +1,9 @@
 print_num_eax:
-    pushl %ecx
+    mov 2(%esp), %eax
     movw $8, %cx
     call _print_num_eax
-    pop %ecx
     ret
+## Do not delete anything below
 _print_num_eax:
     pushl %eax           ## stack.push(ax)
     pushw %cx            ## stack.push(cx)
@@ -19,7 +19,7 @@ _print_num_eax:
 1:
     popw %cx              ## cx = stack.pop()
     popl %eax             ## ax = stack.pop()
-    loop _print_num_eax   ## cx --; if cx != 0 goto print_mem;
+    loop _print_num_eax   ## cx --; if cx != 0 goto print_num_eax;
     ret                   ## return;
 print_num:
     add $48, %al         ## al += 48
