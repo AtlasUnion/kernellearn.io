@@ -1,6 +1,8 @@
 probe_mem:                  ## TODO: modify this function so it takes in parameters as where to put the probed memory map and number of entries
-    mov 2(%esp), %eax
+    movl 2(%esp), %eax  
+    movl %eax, probe_mem_addr     
     push %ebp
+    movl $0, (%eax)
     movl $0, 4(%eax)        ## init 0x8004 to 0 as it stores length of memory
     lea 8(%eax), %di        ## set di to 0x8008 so first 4 bytes can be used to store number of entries and next 4 used to store total memory length
     mov $0, %eax
@@ -33,7 +35,7 @@ notext:
     inc %bp                 ## entry_count++
     mov %es:8(%di), %eax    ## store length into eax
     push %ebx
-    mov 10(%esp), %ebx
+    movl probe_mem_addr, %ebx
     add %eax, 4(%ebx)        ## add length to 0x8004
     pop %ebx
     add $24, %di
@@ -41,8 +43,10 @@ skipentry:
     test %ebx, %ebx         ## AND %ebx, %ebx => check if ebx is zero => if ebx is zero, the list is complete
     jne loop_entry
 loop_done:
-    mov 6(%esp), %eax
+    movl probe_mem_addr, %eax
     mov %bp, (%eax)
     pop %ebp
     clc                     ## clear carry flag
     ret
+probe_mem_addr:
+    .long 0x0
