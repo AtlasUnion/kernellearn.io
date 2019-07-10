@@ -23,6 +23,7 @@ write_stage1:
 write_to_disk:
 	make write_to_MBR
 	make write_stage1
-extract_sym:
+extract_sym_mbr:
 	objcopy --only-keep-debug bootloader_mbr.intermediate bootloader_mbr.symls
-start: write_to_disk
+extract_sym_stage1:
+	objcopy --only-keep-debug bootloader_stage1.intermediate bootloader_stage1.symls
