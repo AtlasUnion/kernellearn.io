@@ -6,7 +6,7 @@ main:
     mov $0x41, %ah                      
     mov $0x80, %dl
     mov $0x55AA, %bx
-    int $0x13
+    int $0x13                          ## check extension existence BIOS call
     jc extension_not_avaliable
     push %eax
     push %ebx
@@ -89,7 +89,7 @@ DAP:
     .byte 0x10
     .byte 0x0
 number_of_sector:
-    .word 1
+    .word 3
 buffer_addr: 
     .word 0x7E00
     .word 0
@@ -97,6 +97,7 @@ disk_lba:
     .long 1
     .long 0
 
+.org 0x01B8
 .org 0x01FE
 .byte 0x55
 .byte 0xAA
