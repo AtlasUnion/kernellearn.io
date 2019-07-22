@@ -65,6 +65,16 @@ int printf(const char* restrict format, ...) {
             if (!print(str, len))
                 return -1;
             written += len;
+        } else if (*format == 'd') {
+            format++;
+            int i = va_arg(parameters, int);
+
+            while (i != 0) {
+                char digit_to_be_print = (i % 10) + 48;
+                i = i / 10;
+                if (!print(&digit_to_be_print, sizeof(digit_to_be_print)))
+                    return -1;
+            }
         } else {
             format = format_begun_at;
             size_t len = strlen(format);
