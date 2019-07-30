@@ -4,15 +4,16 @@
 #include <kernel/tty.h>
 #endif
 
-int putchar(int ic) {
-    #if defined(is_libk)
+int putchar(int ic)
+{
+#if defined(__is_libk)
 
-    char c = (char) ic;
-    terminal_write(&c, sizeof(c));
+	char c = (char)ic;
+	terminal_write(&c, sizeof(c));
 
-    #else
-        // TODO: implement user space code with system call
-    #endif
+#else
+	// TODO: implement user space code with system call
+#endif
 
-    return ic;
+	return ic;
 }
