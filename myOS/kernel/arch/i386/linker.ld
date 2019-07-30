@@ -5,7 +5,7 @@ SECTIONS
         . = 1M;
         .text BLOCK(4K) : ALIGN(4k)
         {
-            *(.multibook)
+            *(.multiboot)
             *(.text)
         }
 
@@ -16,7 +16,12 @@ SECTIONS
 
         .data BLOCK(4K) : ALIGN(4K)
         {
-            *(COMMON)
-            *(.bss)
+            *(.data)
         }
+
+		.bss BLOCK(4K) : ALIGN(4K)
+		{
+			*(COMMON)
+			*(.bss)
+		}
 }

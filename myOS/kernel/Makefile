@@ -27,25 +27,25 @@ CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
 LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
 LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 
-KERNEL_OBJS=
-$(KERNEL_ARCH_OBJS)
-kernel/kernel.o
+KERNEL_OBJS=\
+$(KERNEL_ARCH_OBJS) \
+kernel/kernel.o \
 
-OBJS=
-$(ARCHDIR)/crti.o
-$(ARCHDIR)/crtbegin.o
-$(KERNEL_OBJS)
-$(ARCHDIR)/crtend.o
-$(ARCHDIR)/crtn.o
+OBJS=\
+$(ARCHDIR)/crti.o \
+$(ARCHDIR)/crtbegin.o \
+$(KERNEL_OBJS) \
+$(ARCHDIR)/crtend.o \
+$(ARCHDIR)/crtn.o \
 
-LINK_LIST=
-$(LDFLAGS)
-$(ARCHDIR)/crti.o
-$(ARCHDIR)/crtbegin.o
-$(KERNEL_OBJS)
-$(LIBS)
-$(ARCHDIR)/crtend.o
-$(ARCHDIR)/crtn.o
+LINK_LIST=\
+$(LDFLAGS) \
+$(ARCHDIR)/crti.o \
+$(ARCHDIR)/crtbegin.o \
+$(KERNEL_OBJS) \
+$(LIBS) \
+$(ARCHDIR)/crtend.o \
+$(ARCHDIR)/crtn.o \
 
 .PHONY: all clean install install-headers install-kernel
 .SUFFIXES: .o .c .S
@@ -54,7 +54,7 @@ all: myOS.kernel
 
 myOS.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 		$(CC) -T $(ARCHDIR)/linker.ld -o $@ $(CFLAGS) $(LINK_LIST)
-		grub-file --is-x86-multiboot myos.kernel
+		grub-file --is-x86-multiboot myOS.kernel
 	
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 		OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)`	&& cp "$$OBJ" $@
@@ -74,7 +74,7 @@ install: install-headers install-kernel
 
 install-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
-	cp -R --preserve=timestaps include/. $(DESTDIR)$(INCLUDEDIR)/.
+	cp -R --preserve=timestamps include/. $(DESTDIR)$(INCLUDEDIR)/.
 
 install-kernel: myOS.kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
