@@ -1,8 +1,9 @@
 SYSTEM_HEADER_PROJECTS="libc kernel"
 PROJECTS="libc kernel"
 
+export PATH="$HOME/opt/cross/bin:$PATH"
 export MAKE=${MAKE:-make}
-export HOST=${HOST:-$(./default-host.sh)}
+export HOST=$(./default-host.sh)
 
 export AR=${HOST}-ar
 export AS=${HOST}-as
@@ -20,5 +21,6 @@ export CPPFLAGS=""
 export SYSROOT="$(pwd)/sysroot"
 export CC="$CC --sysroot=$SYSROOT"
 
-if echo "$HOST" | grep -Eq -- '-efl($|-)'; then
+if echo "$HOST" | grep -Eq -- '-elf($|-)'; then
     export CC="$CC -isystem=$INCLUDEDIR"
+fi
