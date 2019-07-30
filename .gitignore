@@ -3,3 +3,4 @@
 *.intermediate
 disk.img
 *.symls
+*.json
