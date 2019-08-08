@@ -3,6 +3,31 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdint.h>
+
+static struct printf_flags {
+	bool left_justify;
+	bool force_plus_minus_sign;
+	bool space_before_positive;
+	bool hex_control;
+	bool padding_with_zero;
+};
+
+static struct printf_width {
+	uint64_t min_number_char_to_print;
+	// TODO: something else here
+};
+
+static struct printf_precision {
+	uint64_t min_number_digit_to_print;
+	// TODO: something else here
+};
+
+static struct printf_control {
+	struct printf_flags flags;
+	struct printf_width width;
+	struct printf_precision precision;
+};
 
 static bool print(const char *data, size_t length)
 {
@@ -17,18 +42,19 @@ static bool print(const char *data, size_t length)
 	return true;
 }
 
-static int printf_int_helper(int input_num)
+static int printf_unsigned_helper(unsigned long long int input_num)
 {
 	if (input_num == 0)
 		return 0;
 	char digit_to_be_print = (input_num % 10) + 48;
-	if (printf_int_helper(input_num / 10) == -1)
+	if (printf_unsigned_helper(input_num / 10) == -1)
 		return -1;
 	if (!print(&digit_to_be_print, sizeof(digit_to_be_print)))
 		return -1;
+	return 0;
 }
 
-static int printf_hex_helper(int input_num)
+static int printf_hex_helper(unsigned long long int input_num)
 {
 	if (input_num == 0)
 		return 0;
@@ -46,8 +72,16 @@ static int printf_hex_helper(int input_num)
 		return -1;
 	if (!print(&hex_to_be_print, sizeof(hex_to_be_print)))
 		return -1;
+	return 0;
 }
 
+
+static void printf_control_parser(char** format) {
+
+}
+
+// TODO: support %d
+// TODO: support minimum print char
 int printf(const char *restrict format, ...)
 {
 	va_list parameters;
@@ -82,6 +116,23 @@ int printf(const char *restrict format, ...)
 		// Case: format[0] = '%' and format[1] != '%'
 		// Special format
 		const char *format_begun_at = format++;
+		bool is_long = false;
+		bool is_long_long = false;
+
+		if (*format == 'l')
+		{
+			format++;
+
+			if (*format == 'l')
+			{
+				format++;
+				is_long_long = true;
+			}
+			else
+			{
+				is_long = true;
+			}
+		}
 
 		if (*format == 'c')
 		{
@@ -108,10 +159,25 @@ int printf(const char *restrict format, ...)
 				return -1;
 			written += len;
 		}
-		else if (*format == 'd')
+		else if (*format == 'u')
 		{
 			format++;
-			int i = va_arg(parameters, int);
+
+			unsigned long long int i;
+			if (is_long)
+			{
+				is_long = false;
+				i = va_arg(parameters, unsigned long int);
+			}
+			else if (is_long_long)
+			{
+				is_long_long = false;
+				i = va_arg(parameters, unsigned long long int);
+			}
+			else
+			{
+				i = va_arg(parameters, unsigned int);
+			}
 
 			if (i == 0)
 			{
@@ -121,14 +187,28 @@ int printf(const char *restrict format, ...)
 			}
 			else
 			{
-				if (printf_int_helper(i) == -1) // recursively printing
+				if (printf_unsigned_helper(i) == -1) // recursively printing
 					return -1;
 			}
 		}
-		else if (*format == 'X') // print in hex
+		else if (*format == 'X') // print in hex; Always print as unsigned
 		{
 			format++;
-			int i = va_arg(parameters, int);
+			unsigned long long int i;
+			if (is_long)
+			{
+				is_long = false;
+				i = va_arg(parameters, unsigned long int);
+			}
+			else if (is_long_long)
+			{
+				is_long_long = false;
+				i = va_arg(parameters, unsigned long long int);
+			}
+			else
+			{
+				i = va_arg(parameters, unsigned int);
+			}
 
 			if (i == 0)
 			{
