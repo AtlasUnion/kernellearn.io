@@ -23,6 +23,11 @@ static struct printf_precision {
 	// TODO: something else here
 };
 
+static struct printf_length {
+	bool is_long;
+	bool is_long_long;
+};
+
 static struct printf_control {
 	struct printf_flags flags;
 	struct printf_width width;

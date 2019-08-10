@@ -23,4 +23,5 @@ void kernel_main(multiboot_info_t *mbd, unsigned int magic_num)
 	printf("Upper Mem: %u MB\n", (mbd->mem_upper) / 1024 + 1);
 
 	init_mem_info(mbd);
+	get_total_memory_size(mbd, 1);
 }

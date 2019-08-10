@@ -4,6 +4,7 @@
 
 struct free_mem_entry free_mem_region[NUM_OF_FREE_REGIONS];
 
+
 int init_mem_info(multiboot_info_t *mbd)
 {
 	free_mem_region[0].valid_bit = 0;
