@@ -27,10 +27,11 @@ CPPFLAGS:=$(CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
 LDFLAGS:=$(LDFLAGS) $(KERNEL_ARCH_LDFLAGS)
 LIBS:=$(LIBS) $(KERNEL_ARCH_LIBS)
 
+KERNEL_SRCS := $(shell find . -path ./arch -prune -o -type f -name "*.c" -print)
+
 KERNEL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
-kernel/kernel.o \
-kernel/mem_info.o \
+$(patsubst %.c,%.o,$(KERNEL_SRCS)) \
 
 OBJS=\
 $(ARCHDIR)/crti.o \
