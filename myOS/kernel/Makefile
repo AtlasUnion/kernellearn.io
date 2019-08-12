@@ -31,7 +31,7 @@ KERNEL_SRCS := $(shell find . -path ./arch -prune -o -type f -name "*.c" -print)
 
 KERNEL_OBJS=\
 $(KERNEL_ARCH_OBJS) \
-$(patsubst %.c,%.o,$(KERNEL_SRCS)) \
+$(patsubst %.c,%.o,$(KERNEL_SRCS))
 
 OBJS=\
 $(ARCHDIR)/crti.o \
@@ -49,6 +49,8 @@ $(LIBS) \
 $(ARCHDIR)/crtend.o \
 $(ARCHDIR)/crtn.o \
 
+DEPFILES := $(OBJS:.o=.d)
+
 .PHONY: all clean install install-headers install-kernel
 .SUFFIXES: .o .c .S
 
@@ -61,11 +63,13 @@ myOS.kernel: $(OBJS) $(ARCHDIR)/linker.ld
 $(ARCHDIR)/crtbegin.o $(ARCHDIR)/crtend.o:
 		OBJ=`$(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=$(@F)`	&& cp "$$OBJ" $@
 
-%.o: %.c
-		$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
+%.o: %.c %.d
+		$(CC) -MD -MP -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
 
-%.o: %.S
-		$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
+%.o: %.S %.d
+		$(CC) -MD -MP -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
+
+$(DEPFILES): ;
 
 clean:
 		rm -f myOS.kernel
@@ -77,9 +81,9 @@ install: install-headers install-kernel
 install-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
 	cp -R --preserve=timestamps include/. $(DESTDIR)$(INCLUDEDIR)/.
-
+ 
 install-kernel: myOS.kernel
 	mkdir -p $(DESTDIR)$(BOOTDIR)
 	cp myOS.kernel $(DESTDIR)$(BOOTDIR)
 
--include $(OBJS:.o=.d)
+include $(wildcard $(DEPFILES))

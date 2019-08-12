@@ -50,6 +50,10 @@ LIBK_OBJS=$(FREEOBJS:.o=.libk.o)
 
 BINARIES=libk.a
 
+DEPFILES :=\
+$(OBJS:.o=.d)\
+$(LIBK_OBJS:.o=.d)\
+
 .PHONY: all clean install install-headers install-libs
 
 all: $(BINARIES)
@@ -60,17 +64,19 @@ libc.a: $(OBJs)
 libk.a: $(LIBK_OBJS)
 		$(AR) rcs $@ $(LIBK_OBJS)
 
-%.o: %.c
-		$(CC) -MD -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
+%.o: %.c %.d
+		$(CC) -MD -MP -c $< -o $@ -std=gnu11 $(CFLAGS) $(CPPFLAGS)
 
-%.S: %.c
-		$(CC) -MD -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
+%.S: %.c %.d
+		$(CC) -MD -MP -c $< -o $@ $(CFLAGS) $(CPPFLAGS)
 
-%.libk.o: %.c
-		$(CC) -MD -c $< -o $@ -std=gnu11 $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
+%.libk.o: %.c %.d
+		$(CC) -MD -MP -c $< -o $@ -std=gnu11 $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
 
-%.libk.o: %.S
-		$(CC) -MD -c $< -o $@ $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
+%.libk.o: %.S %.d
+		$(CC) -MD -MP -c $< -o $@ $(LIBK_CFLAGS) $(LIBK_CPPFLAGS)
+
+$(DEPFILES): ;
 
 clean:
 		rm -f $(BINARIES) *.a
@@ -87,5 +93,4 @@ install-libs: $(BINARIES)
 		mkdir -p $(DESTDIR)$(LIBDIR)
 		cp $(BINARIES) $(DESTDIR)$(LIBDIR)
 
--include $(OBJS:.o=.d)
--include $(LIBK_OBJS:.o=.d)
+include $(wildcard $(DEPFILES))

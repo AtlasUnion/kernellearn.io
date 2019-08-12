@@ -5,7 +5,8 @@
 #include <string.h>
 #include <stdint.h>
 
-static struct printf_flags {
+struct printf_flags
+{
 	bool left_justify;
 	bool force_plus_minus_sign;
 	bool space_before_positive;
@@ -13,22 +14,26 @@ static struct printf_flags {
 	bool padding_with_zero;
 };
 
-static struct printf_width {
+struct printf_width
+{
 	uint64_t min_number_char_to_print;
 	// TODO: something else here
 };
 
-static struct printf_precision {
+struct printf_precision
+{
 	uint64_t min_number_digit_to_print;
 	// TODO: something else here
 };
 
-static struct printf_length {
+struct printf_length
+{
 	bool is_long;
 	bool is_long_long;
 };
 
-static struct printf_control {
+struct printf_control
+{
 	struct printf_flags flags;
 	struct printf_width width;
 	struct printf_precision precision;
@@ -80,9 +85,8 @@ static int printf_hex_helper(unsigned long long int input_num)
 	return 0;
 }
 
-
-static void printf_control_parser(char** format) {
-
+static void printf_control_parser(char **format)
+{
 }
 
 // TODO: support %d

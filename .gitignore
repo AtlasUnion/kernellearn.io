@@ -4,3 +4,4 @@
 disk.img
 *.symls
 *.json
+tmp/*
