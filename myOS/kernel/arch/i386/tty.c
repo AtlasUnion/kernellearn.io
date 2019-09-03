@@ -7,9 +7,11 @@
 
 #include "vga.h"
 
+// TODO: rewrite size to be more general: uint32 to unsigned long
+
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
-static uint16_t *const VGA_MEMORY = (uint16_t *)0xB8000;
+static uint16_t *const VGA_MEMORY = (uint16_t *)0xC00B8000;
 
 static size_t terminal_row;
 static size_t terminal_column;
