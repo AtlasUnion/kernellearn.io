@@ -4,6 +4,7 @@
 #include <stdint.h>
 #define NUM_OF_FREE_REGIONS 4
 
+
 struct free_mem_entry
 {
 	struct multiboot_mmap_entry entry_info;
@@ -11,8 +12,6 @@ struct free_mem_entry
 };
 
 extern struct free_mem_entry free_mem_region[NUM_OF_FREE_REGIONS];
-
-int init_mem_info(multiboot_info_t *mbd);
 
 uint64_t get_total_memory_size(multiboot_info_t *mbd, char flag);
 

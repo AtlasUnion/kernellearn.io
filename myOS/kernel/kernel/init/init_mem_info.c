@@ -3,9 +3,18 @@
 #include <stddef.h>
 #include <kernel/multiboot.h>
 #include <stdint.h>
+#include <kernel/init.h>
+
+extern int kernel_start;
+extern int kernel_end;
+
+// TODO: setup and init zone
 
 struct free_mem_entry free_mem_region[NUM_OF_FREE_REGIONS];
 
+/**
+ * init free mem region struct to all invalid
+ */
 static void init_free_mem_region_entries()
 {
 	for (int i = 0; i < NUM_OF_FREE_REGIONS; i++)
@@ -14,11 +23,17 @@ static void init_free_mem_region_entries()
 	}
 }
 
+/**
+ * Init mem info for later use
+ * TODO: support kernel larger than 14 MB
+ */
 int init_mem_info(multiboot_info_t *mbd)
 {
+
 	if ((mbd->flags & 0x40) == 0)
 		return -1;
 
+	uint64_t kernel_size = &kernel_end - &kernel_start;
 	init_free_mem_region_entries();
 
 	multiboot_memory_map_t *mmap = (multiboot_memory_map_t *)(mbd->mmap_addr);
@@ -30,12 +45,22 @@ int init_mem_info(multiboot_info_t *mbd)
 	{
 		if (mmap->type == MULTIBOOT_MEMORY_AVAILABLE)
 		{
-			free_mem_region[index_in_free_mem_region_entries].valid_bit = 1;
-			free_mem_region[index_in_free_mem_region_entries].entry_info = *mmap;
-			index_in_free_mem_region_entries++;
+			if (mmap->addr != 0)
+			{
+				free_mem_region[index_in_free_mem_region_entries].valid_bit = 1;
+				free_mem_region[index_in_free_mem_region_entries].entry_info = *mmap;
+
+				if (free_mem_region[index_in_free_mem_region_entries].entry_info.addr == &kernel_start)
+				{
+					free_mem_region[index_in_free_mem_region_entries].entry_info.addr += kernel_size;
+					free_mem_region[index_in_free_mem_region_entries].entry_info.len -= kernel_size;
+				}
+				index_in_free_mem_region_entries++;
+			}
 		}
 
 		mmap = (multiboot_memory_map_t *)((unsigned int)mmap + mmap->size + sizeof(mmap->size));
 	}
+
 	return 0;
 }
