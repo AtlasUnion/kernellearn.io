@@ -4,7 +4,7 @@
 .set FLAGS,    ALIGN | MEMINFO  # this is the Multiboot 'flag' field
 .set MAGIC,    0x1BADB002       # 'magic number' lets bootloader find the header
 .set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
-.set KERNEL_VMA, 0xC0000000
+.set KERNEL_VMA, 0xC0100000
 .set KERNEL_LMA, 0x00100000
 .set ADDR_OFFSET, (KERNEL_VMA - KERNEL_LMA)
 # Declare a header as in the Multiboot Standard.
@@ -38,8 +38,11 @@ _start:
 	movl $stack_top, %esp
 kernel_early_main:
 # Setup Paging (Must do first; otherwise cannot jump nor call)
+# Page is set up as following: (kernel starts at 0xC0100000)
+# v_addr: 0 : kernel end addr <-> 0 : kernel end
+# v_addr: 0 : kernel end addr <-> 0xC0000000 : (0xC0000000 + kernel end)
 setup_boot_page_table_1:
-	movl $(boot_page_table_1 - ADDR_OFFSET), %edi
+	movl $(boot_page_table_1 - ADDR_OFFSET), %edi // move physcial address of boot_page_table into %edi
 	movl $0, %esi
 	movl $1024, %ecx
 1:
@@ -47,37 +50,20 @@ setup_boot_page_table_1:
 	jge 3f
 
 	movl %esi, %edx
-	orl  $0x003, %edx
-	movl %edx, (%edi)
+	orl  $0x003, %edx // read write, present bit on
+	movl %edx, (%edi) // write into boot_page_table
 2:
-	addl $4096, %esi
-	addl $4, %edi
-	loop 1b
-setup_boot_page_table_2:
-3:
-	movl $(boot_page_table_2 - ADDR_OFFSET), %edi
-	movl $0x00100000, %esi
-	movl $1024, %ecx
-1:
-	cmpl $(kernel_end - ADDR_OFFSET), %esi // beyond kernel
-	jge 3f
-
-	movl %esi, %edx
-	orl  $0x003, %edx
-	movl %edx, (%edi)
-2:
-	addl $4096, %esi
-	addl $4, %edi
+	addl $4096, %esi // to next page
+	addl $4, %edi    // to next entry in page table
 	loop 1b
 3:
 	movl $(boot_page_table_1 - ADDR_OFFSET + 0x003), boot_page_directory - ADDR_OFFSET + 0
-	movl $(boot_page_table_2 - ADDR_OFFSET + 0x003), boot_page_directory - ADDR_OFFSET + 768*4
+	movl $(boot_page_table_1 - ADDR_OFFSET + 0x003), boot_page_directory - ADDR_OFFSET + 768*4
 	movl $(boot_page_directory - ADDR_OFFSET), %ecx
 	movl %ecx, %cr3
-	movl %cr3, %ecx
 
 	movl %cr0, %ecx
-	orl $0x80000000, %ecx
+	orl $0x80010000, %ecx
 	movl %ecx, %cr0
 
 	lea 4f, %ecx
