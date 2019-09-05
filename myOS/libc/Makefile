@@ -27,17 +27,11 @@ CPPFLAGS:=$(CPPFLAGS) $(ARCH_CPPFLAGS)
 LIBK_CFLAGS:=$(LIBK_CFLAGS) $(KERNEL_ARCH_CFLAGS)
 LIBK_CPPFLAGS:=$(LIBK_CPPFLAGS) $(KERNEL_ARCH_CPPFLAGS)
 
+FREE_SRCS := $(shell find . -path ./arch -prune -o -type f -name "*.c" -print)
+
 FREEOBJS=\
 $(ARCH_FREEOBJS) \
-stdio/printf.o \
-stdio/putchar.o \
-stdio/puts.o \
-stdlib/abort.o \
-string/memcmp.o \
-string/memcpy.o \
-string/memmove.o \
-string/memset.o \
-string/strlen.o \
+$(patsubst %.c,%.o,$(FREE_SRCS))
 
 HOSTEDOBJS=\
 $(ARCH_HOSTEDOBJS) \
